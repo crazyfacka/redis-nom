@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,16 +23,17 @@ func loadConfiguration() error {
 }
 
 func main() {
-	logger2Nsq := l2n.NewLog2Nsq(&l2n.Options{
-		AppName: "redis-nom",
-	})
-
-	l2n.Println("Starting Redis NOM NOM NOM...")
+	log.Println("Starting Redis NOM NOM NOM...")
 
 	if err := loadConfiguration(); err != nil {
 		l2n.Printf("%v", err)
 		os.Exit(-1)
 	}
+
+	logger2Nsq := l2n.NewLog2Nsq(&l2n.Options{
+		AppName: "redis-nom",
+		Addr:    cfg.Nsq.Address[0],
+	})
 
 	l2n.Println("Configuration loaded")
 	l2n.Printf("%+v", cfg)

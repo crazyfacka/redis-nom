@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/redis.v3"
 	l2n "github.com/crazyfacka/log2nsq"
 	"github.com/crazyfacka/redis-nom/dispatcher"
+	"gopkg.in/redis.v3"
 )
 
 var infoSections = []string{"clients", "memory", "stats", "replication"}
@@ -122,14 +122,19 @@ func getSentinelClient(sentinels []string) (*redis.Client, error) {
 
 func apples(name string, addr string, master bool) {
 	var role string
+	if master {
+		role = "master"
+	} else {
+		role = "slave"
+	}
 
 	client := redis.NewClient(&redis.Options{
 		Addr: addr,
 	})
 
 	if err := client.Ping().Err(); err != nil {
-		l2n.Printf("Error connecting to slave '%s' of pod %s\n", addr, name)
-		pd("Error connecting to slave", map[string]interface{}{
+		l2n.Printf("Error connecting to %s '%s' of pod %s\n", role, addr, name)
+		pd("Error connecting to "+role, map[string]interface{}{
 			"Pod":     name,
 			"Address": addr,
 		})
@@ -139,12 +144,6 @@ func apples(name string, addr string, master bool) {
 	setRedisClientName(client)
 
 	l2n.Printf("Connected to Redis '%s' @ %s", name, addr)
-
-	if master {
-		role = "master"
-	} else {
-		role = "slave"
-	}
 
 	ticker := time.NewTicker(time.Second * 30)
 	for range ticker.C {
