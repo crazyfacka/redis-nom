@@ -1,0 +1,5 @@
+#!/bin/bash
+CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-s' -installsuffix cgo -o main .
+docker rmi -f crazyfacka/redis-nom
+docker build -t crazyfacka/redis-nom .
+docker push crazyfacka/redis-nom
