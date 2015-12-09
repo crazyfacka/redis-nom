@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	l2n "github.com/crazyfacka/log2nsq"
+	"github.com/crazyfacka/redis-nom/commons"
 	"github.com/crazyfacka/redis-nom/dispatcher"
 	"github.com/crazyfacka/redis-nom/monitor"
 
@@ -37,6 +38,8 @@ func main() {
 
 	l2n.Println("Configuration loaded")
 	l2n.Printf("%+v", cfg)
+
+	commons.HoldMeTillICantGetEnough(cfg.Cache.Mastername, cfg.Cache.Sentinel, cfg.General.Env)
 
 	if err := getSentinelClient(); err != nil {
 		l2n.Printf("%v", err)
